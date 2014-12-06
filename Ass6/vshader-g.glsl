@@ -28,10 +28,82 @@ uniform float bottom;
 uniform float near;
 uniform float far;
 
+//mydata
+varying	vec4 color;	
+varying float red;
+varying float green;
+varying float blue;
+
+
 // OUTGOING DATA
+
+vec3 GetPointToLightVec()
+{
+    vec4 sunloc = vec4(0.0, 5.0, 2.0, 1.0);
+    return  (sunloc -vPosition).xyz;
+}
+
+vec3 GetPointToviwerVec()
+{
+    return normalize(cPosition.xyz) - vPosition.xyz;
+}
+vec3 ReflectedLight()
+{
+
+	return normalize(reflect(normalize(-GetPointToLightVec()),normalize(vNormal)));
+}
+//Returns a vector containg the ambient color calculations in the form [ambient red,ambient green, ambient blue]
+vec3 GetAmbient()
+{
+	float red = 0.5 * 0.5;
+	float green = 0.1 * 0.5;
+	float blue = 0.9 * 0.5;
+	 
+    return vec3(red,green,blue);
+}
+
+//Returns a vector containg the ambient color calculations in the form [ambient red,ambient green, ambient blue]
+vec3 GetDiffuse()
+{
+	vec3 lightvec = normalize(GetPointToLightVec());
+	vec3 normalvec = normalize(vNormal);
+	float LN =  dot(lightvec,normalvec);
+	
+	float red = 0.89 * 0.7 * LN ;
+	float green = 0.0 * 0.7 * LN;
+	float blue = 0.0 * 0.7 * LN;
+	 
+    return vec3(red,green,blue);
+}
+
+vec3 GetSpec()
+{
+	vec3 vecViewer = normalize(GetPointToviwerVec());
+	vec3 vecReflect = normalize(ReflectedLight());
+	float dotted = dot(vecReflect,vecViewer);
+	float power  = pow(max(dotted,0),10.0);
+
+	float rightEquation = power;
+	
+	float red = 1.0 * 1.0  * rightEquation;
+	float green = 1.0 * 1.0  * rightEquation;
+	float blue = 1.0 * 1.0  * rightEquation;
+	
+	
+	return vec3(red,green,blue);
+}
 
 void main()
 {
+	
+	vec3 ambient = GetAmbient();
+	vec3 diffuse = GetDiffuse();
+	vec3 specular = GetSpec();
+	
+    red = ambient.x + diffuse.x + specular.x ;
+    green = ambient.y + diffuse.y + specular.y;
+    blue = ambient.z + diffuse.z + specular.z;
+    
     // Compute the sines and cosines of each rotation about each axis
     vec3 angles = radians( theta );
     vec3 c = cos( angles );

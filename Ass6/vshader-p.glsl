@@ -28,10 +28,39 @@ uniform float bottom;
 uniform float near;
 uniform float far;
 
+varying vec3 vertexLight;
+varying vec3 normal;
+varying vec3 vertex;
+varying vec3 veiwer;
+varying vec3 reflected;
 // OUTGOING DATA
+
+
+vec3 GetPointToLightVec()
+{
+    vec4 sunloc = vec4(0.0, 5.0, 2.0, 1.0);
+    return  (sunloc -vPosition).xyz;
+}
+
+vec3 GetPointToviwerVec()
+{
+    return normalize(cPosition.xyz) - vPosition.xyz;
+}
+vec3 ReflectedLight()
+{
+
+	return normalize(reflect(normalize(-GetPointToLightVec()),normalize(vNormal)));
+}
 
 void main()
 {
+	vertexLight = GetPointToLightVec();
+	veiwer = GetPointToviwerVec();
+	vertex = vPosition.xyz;
+	normal = vNormal;
+	reflected = ReflectedLight();
+	
+	
     // Compute the sines and cosines of each rotation about each axis
     vec3 angles = radians( theta );
     vec3 c = cos( angles );

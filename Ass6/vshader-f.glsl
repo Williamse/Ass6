@@ -28,10 +28,73 @@ uniform float bottom;
 uniform float near;
 uniform float far;
 
+
+//My data
+varying	vec4 color;	
+varying float red;
+varying float green;
+varying float blue;
+
+
 // OUTGOING DATA
+ 
+
+
+//vec4 calcIllumination
+//{
+//	return 
+//}
+
+vec3 GetPointToLightVec()
+{
+    vec4 sunloc = vec4(0.0,5.0,2.0,1.0);
+    return  (sunloc - vPosition).xyz;
+}
+
+
+
+//Returns a vector containg the ambient color calculations in the form [ambient red,ambient green, ambient blue]
+vec3 GetAmbient()
+{
+	float red = 0.5 * 0.5;
+	float green = 0.1 * 0.5;
+	float blue = 0.9 * 0.5;
+	 
+    return vec3(red,green,blue);
+}
+
+//Returns a vector containg the ambient color calculations in the form [ambient red,ambient green, ambient blue]
+vec3 GetDiffuse()
+{
+	vec3 lightvec = normalize(GetPointToLightVec());
+	vec3 normalvec = normalize(vNormal);
+	float LN =  dot(lightvec,normalvec);
+	
+	float red = 0.89 * 0.7 * LN ;
+	float green = 0.0 * 0.7 * LN;
+	float blue = 0.0 * 0.7 * LN;
+	 
+    return vec3(red,green,blue);
+}
+
+
 
 void main()
 {
+	
+	vec3 sun = GetPointToLightVec();
+	
+  //  color =  vec4(0.0, 1.0, 0.0, 1.0);
+    color = vec4( 1.0, 1.0, 0.0, 1.0 );
+    
+    vec3 amb = GetAmbient();
+    vec3 diffuse = GetDiffuse();
+    
+    red = amb.x + diffuse.x;
+    green = amb.y + diffuse.y ;
+    blue = amb.z + diffuse.z;
+    
+    
     // Compute the sines and cosines of each rotation about each axis
     vec3 angles = radians( theta );
     vec3 c = cos( angles );
@@ -91,3 +154,4 @@ void main()
     // Transform the vertex location into clip space
     gl_Position =  projMat * viewMat  * modelMat * vPosition;
 }
+
